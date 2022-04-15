@@ -6,7 +6,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "usuario")
+
 public class Usuario {
 	private int id;
 	private String nombre;
@@ -32,7 +32,6 @@ public class Usuario {
 	public Usuario() {
 		
 	}
-	@XmlAttribute
 	public int getId() {
 		return id;
 	}
