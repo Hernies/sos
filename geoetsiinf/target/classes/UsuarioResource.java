@@ -14,6 +14,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 
 @Path("/usuarios")
@@ -22,7 +23,7 @@ public class UsuarioResource {
     @POST
     @Consumes()
     @Produces(MediaType.TEXT_PLAIN)
-    public String registerUsuario(@PathParam("usuario_id") String id){
+    public Response registerUsuario(@PathParam("usuario_id") String id){
         //TODO MÉTODO        
 
         return "ok";
@@ -31,7 +32,7 @@ public class UsuarioResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Usuario> getUsuarios(@QueryParam ("string") String string){
+    public Response getUsuarios(@QueryParam ("string") String string){
         
         //TODO QUERY
 
@@ -42,7 +43,7 @@ public class UsuarioResource {
     @GET
     @Path("/{usuario_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Usuario getUsuario(@PathParam("usuario_id") String id){
+    public Response getUsuario(@PathParam("usuario_id") String id){
         
         //TODO MÉTODO        
 
@@ -53,7 +54,7 @@ public class UsuarioResource {
     @PUT
     @Path("/{usuario_id}")
     @Produces(MediaType.TEXT_PLAIN)
-    public String setUsuario(@PathParam("usuario_id") String id){
+    public Response setUsuario(@PathParam("usuario_id") String id){
         
         //TODO MÉTODO        
 
@@ -63,7 +64,7 @@ public class UsuarioResource {
     @DELETE
     @Path("/{usuario_id}")
     @Produces(MediaType.TEXT_PLAIN)
-    public String deleteUsuario (@PathParam("usuario_id") String id){
+    public Response deleteUsuario (@PathParam("usuario_id") String id){
         
         //TODO MÉTODO
 
@@ -74,7 +75,7 @@ public class UsuarioResource {
     @POST
     @Path("/{usuario_id}/tesoros_añadidos")
     @Produces(MediaType.TEXT_PLAIN)
-    public String publicarTesoro(@PathParam("usuario_id") String id){
+    public Response publicarTesoro(@PathParam("usuario_id") String id){
 
         //TODO MÉTODO
 
@@ -84,7 +85,7 @@ public class UsuarioResource {
     @GET
     @Path("/{usuario_id}/tesoros_añadidos")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Tesoro> getTesorosCreadosUsuario(@PathParam("usuario_id") String id, @QueryParam("string") String string, @QueryParam("fecha") Date date, 
+    public Response getTesorosCreadosUsuario(@PathParam("usuario_id") String id, @QueryParam("string") String string, @QueryParam("fecha") Date date, 
     @QueryParam("desplazamiento") int desplazamiento, @QueryParam("terreno") String terreno, @QueryParam("dificultad") int dificultad){
         
         //TODO QUERYS 
