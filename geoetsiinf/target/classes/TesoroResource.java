@@ -1,5 +1,6 @@
 package com.sos.resources;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -12,6 +13,7 @@ public class TesoroResource {
     @DELETE
     @Path("{id_tesoro}")
     @Produces(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.APPLICATION_JSON)
     public String deleteTesoro(@PathParam("id_tesoro") int  id_tesoro){
 
         //TODO MÉTODO
