@@ -11,7 +11,7 @@ public class Usuario {
 	private String apellidos;
 	private String localidad;
 	private String correo;
-	private Integer edad;
+	private int edad;
 	private List<Tesoro> tesoros_añadidos;
 	private List<Tesoro> tesoros_descubiertos;
 	
@@ -31,8 +31,8 @@ public class Usuario {
 		
 	}
 	public boolean usuarioConNull(){
-		boolean hasNull=(this.id.equals(null))||(this.nombre.equals(null))||(this.apellidos.equals(null))||(this.localidad.equals(null))||
-		(this.correo.equals(null))|| this.edad.equals(null);
+		boolean hasNull=(this.id==null)||(this.nombre==null)||(this.apellidos==null)||(this.localidad==null)||
+		(this.correo==null);
 
 		return hasNull;
 	}
@@ -84,7 +84,4 @@ public class Usuario {
     public void setTesoros_descubiertos(List<Tesoro> tesoros_descubiertos) {
         this.tesoros_descubiertos = tesoros_descubiertos;
     }
-	public void addTesoro_añadidos(List<Tesoro> tesoros_añadidos, Tesoro tesoro){
-		
-	}
 }

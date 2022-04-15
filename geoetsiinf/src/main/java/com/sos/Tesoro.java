@@ -6,8 +6,8 @@ public class Tesoro {
 	
 	private int id;
 	private Date fecha;
-	private long latitud;
-	private long longitud;
+	private Long latitud;
+	private Long longitud;
 	private String tamaño;
 	private String dificultad;
 	private String tipo_terreno;
@@ -29,7 +29,12 @@ public class Tesoro {
 	public Tesoro() {
 		
 	}
-	
+	public boolean usuarioConNull(){
+		boolean hasNull=(this.fecha==null) || (this.latitud==null) || (this.longitud==null) || (this.tamaño==null) ||
+		(this.dificultad==null) || (this.tipo_terreno==null) || (this.ID_usuario==null);
+
+		return hasNull;
+	}
 	public int getId() {
 		return id;
 	}
