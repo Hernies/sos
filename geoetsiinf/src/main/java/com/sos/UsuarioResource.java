@@ -30,7 +30,7 @@ import org.omg.CosNaming._BindingIteratorImplBase;
 
 @Path("/usuarios")
 public class UsuarioResource {
-    private String url = "jdbc:mysql://localhost:3306/geoetsiinfdb";
+    private String url = "jdbc:mysql://localhost:3306/geoetsiinf";
     static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
     // @POST
@@ -41,21 +41,20 @@ public class UsuarioResource {
 
     //     return "ok";
     // }
-
+    
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUsuarios(@QueryParam ("string") String string) throws ClassNotFoundException{
         List<Usuario> usuarios = new ArrayList<Usuario>();
-        System.out.println("we in");
         Class.forName(DRIVER);
-        //ARREGLAR PERMISOS
         try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
+            System.out.println("we in");
             Statement stmt = conn.createStatement();
             String sql;
-            if(string.isEmpty()){
+            if(string != null){//TODO FIX PARA TRATAR COMO QUERY
                 sql = "SELECT * FROM usuario";
-            } else {//TODO FIX PARA TRATAR COMO QUERY
+            } else {
                 sql = "SELECT * FROM usuario";
             }
 
@@ -166,4 +165,25 @@ public class UsuarioResource {
 
     // }
 
+    
+    private void showDatabases(){
+        Connection conn = null;
+    try {
+        String myConnectionString =
+                "jdbc:mysql://127.0.0.1:3306?" +
+                "useUnicode=yes&characterEncoding=UTF-8";
+        conn = DriverManager.getConnection(myConnectionString, "root", "");
+        Statement stmt = conn.createStatement();
+        stmt.execute("SHOW DATABASES");
+        ResultSet rs = stmt.getResultSet();
+        while (rs.next()) {
+            System.out.println(rs.getString(1));
+        }
+        rs.close();
+        stmt.close();
+        conn.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+    }
+    }
 }
