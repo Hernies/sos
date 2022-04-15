@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 
 public class Usuario {
-	private int id;
+	private String id;
 	private String nombre;
 	private String apellidos;
 	private String localidad;
@@ -17,9 +17,9 @@ public class Usuario {
 	private List<Tesoro> tesoros_añadidos;
 	private List<Tesoro> tesoros_descubiertos;
 	
-	public Usuario(int id, String nombre, String apellidos, String localidad, String correa, int edad) {
+	public Usuario(String ID, String nombre, String apellidos, String localidad, String correa, int edad) {
 		super();
-		//this.id = id;
+		this.id = ID;
 		this.nombre = nombre;
 		this.apellidos = apellidos;
 		this.localidad = localidad;
@@ -32,10 +32,10 @@ public class Usuario {
 	public Usuario() {
 		
 	}
-	public int getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	@XmlAttribute
