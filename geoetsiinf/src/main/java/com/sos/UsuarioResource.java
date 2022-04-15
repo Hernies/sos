@@ -30,6 +30,7 @@ import org.omg.CosNaming._BindingIteratorImplBase;
 @Path("/usuarios")
 public class UsuarioResource {
     private String url = "jdbc:mysql://localhost:3306/geoetsiinfdb";
+    static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
     // @POST
     // @Consumes(MediaType.APPLICATION_JSON)
@@ -43,8 +44,9 @@ public class UsuarioResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsuarios(@QueryParam ("string") String string){
+    public Response getUsuarios(@QueryParam ("string") String string) throws ClassNotFoundException{
         List<Usuario> usuarios = new ArrayList<Usuario>();
+        Class.forName(DRIVER);
         try (Connection conn = DriverManager.getConnection(url, "mysql.geoetsiinf", "mysql.geoetsiinf");) {
             Statement stmt = conn.createStatement();
             String sql;
