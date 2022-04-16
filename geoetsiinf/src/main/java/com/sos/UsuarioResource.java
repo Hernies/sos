@@ -32,6 +32,7 @@ import javassist.bytecode.stackmap.BasicBlock.Catch;
 
 @Path("/usuarios")
 public class UsuarioResource {
+
     @Context
     private UriInfo uriInfo;
     
@@ -41,7 +42,6 @@ public class UsuarioResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    
     public Response registerUsuario(Usuario usuario) throws ClassNotFoundException, SQLException{
         Class.forName(DRIVER);
         if(usuario.usuarioConNull()){
@@ -51,15 +51,14 @@ public class UsuarioResource {
                 //añado a la BD mi usuario
                 Statement stmt = conn.createStatement();
                 String sql;
-                sql="INSERT INTO usuario VALUES('" +usuario.getId() +  "', '"+usuario.getNombre() + "', '"+ usuario.getApellidos()+ "', '"+ 
-                usuario.getLocalidad()+ "','"+usuario.getCorreo()+ "', '"+usuario.getEdad()+ "')";
+                sql="INSERT INTO usuario VALUES('" +usuario.getId() +  "', '"+usuario.getNombre() + "', '"+ usuario.getApellidos()+ "', '"+ usuario.getLocalidad()+ "','"+usuario.getCorreo()+ "', '"+usuario.getEdad()+ "')";
                 stmt.executeUpdate(sql);
-            } catch (SQLIntegrityConstraintViolationException ex) {
+            } 
+            catch (SQLIntegrityConstraintViolationException ex) {
                 return Response.status(Response.Status.CONFLICT).entity("Usuario ya existe!").build();
             } 
-            return Response.status(Response.Status.OK).entity(usuario).header("Location", uriInfo.getAbsolutePath()+"/"+usuario.getId()).build();
         }
-        
+        return Response.status(Response.Status.OK).entity("Usuario añadido correctamente!").header("Location", uriInfo.getAbsolutePath()+"/"+usuario.getId()).build();
     }
     
 
@@ -158,21 +157,23 @@ public class UsuarioResource {
          return Response.status(Response.Status.OK).entity("actualizacion de datos hecha correctamente").build();
     }
 
+
+    //TODO URI
+    //TODO PRUEBA
     @DELETE
     @Path("/{usuario_id}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response deleteUsuario (@PathParam("usuario_id") String id) throws ClassNotFoundException{
+        if(id==null){//si no hemos metido un string debe de fallar
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         Class.forName(DRIVER);
         try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
-            if(id==null){//si no hemos metido un string debe de fallar
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            }
             //borro de la BD mi usuario
             Statement stmt = conn.createStatement();
             String sql;
-            sql="DELETE FROM geoetsiinf.usuario WHERE ID="+id;
-            stmt.executeQuery(sql);
-
+            sql="DELETE FROM geoetsiinf.usuario WHERE ID='"+id+"'";
+            stmt.executeUpdate(sql);
         }catch (SQLException e){
             return Response.status(Response.Status.BAD_REQUEST).entity("aprende a hacer peticiones chaval").build();
         }
@@ -182,7 +183,8 @@ public class UsuarioResource {
 
     @POST
     @Path("/{usuario_id}/tesoros_añadidos")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response publicarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro) throws ClassNotFoundException, SQLException{
        Class.forName(DRIVER);
         if(tesoro.usuarioConNull()){
@@ -216,15 +218,15 @@ public class UsuarioResource {
         
             return Response.status(Response.Status.OK).entity(tesorosA).build();
     }
-
+    
+    //TODO HEADER
     // @POST
     // @Path("/{usuario_id}/tesoros_descubiertos")
     // @Produces(MediaType.TEXT_PLAIN)
-    // public String encontrarTesoro(@PathParam("usuario_id") String id){
+    // public Response encontrarTesoro(@PathParam("usuario_id") String id){
 
-    //     //TODO MÉTODO
-
-    //     return "Se ha añadido el texto correctamente";
+        
+    //     return Response.status(Response.Status.OK).entity("Se ha añadido el texto correctamente")build();
     // }
 
     // @GET
@@ -271,4 +273,8 @@ public class UsuarioResource {
         ex.printStackTrace();
     }
     }
+
+
+    //TODO AMIGOS
+
 }
