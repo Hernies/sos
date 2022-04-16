@@ -6,20 +6,20 @@ public class Tesoro {
 	
 	private int id;
 	private Date fecha;
-	private Long latitud;
-	private Long longitud;
+	private Float latitud;
+	private Float longitud;
 	private String tamaño;
 	private String dificultad;
 	private String tipo_terreno;
 	private String ID_usuario;
 	
-	public Tesoro(int id, Date fecha, long latitud, long longitud, String tamaño, String dificultad,
+	public Tesoro(int id, Date fecha, float f, float g, String tamaño, String dificultad,
 			String tipo_terreno, String iD_usuario) {
 		super();
 		//this.id = id;
 		this.fecha = fecha;
-		this.latitud = latitud;
-		this.longitud = longitud;
+		this.latitud = f;
+		this.longitud = g;
 		this.tamaño = tamaño;
 		this.dificultad = dificultad;
 		this.tipo_terreno = tipo_terreno;
@@ -29,7 +29,7 @@ public class Tesoro {
 	public Tesoro() {
 		
 	}
-	public boolean usuarioConNull(){
+	public boolean conNull(){
 		boolean hasNull=(this.fecha==null) || (this.latitud==null) || (this.longitud==null) || (this.tamaño==null) ||
 		(this.dificultad==null) || (this.tipo_terreno==null) || (this.ID_usuario==null);
 
@@ -47,16 +47,16 @@ public class Tesoro {
 	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
-	public long getLatitud() {
+	public Float getLatitud() {
 		return latitud;
 	}
-	public void setLatitud(long latitud) {
+	public void setLatitud(Float latitud) {
 		this.latitud = latitud;
 	}
-	public long getLongitud() {
+	public Float getLongitud() {
 		return longitud;
 	}
-	public void setLongitud(long longitud) {
+	public void setLongitud(Float longitud) {
 		this.longitud = longitud;
 	}
 	public String getTamaño() {

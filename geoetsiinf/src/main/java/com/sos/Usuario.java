@@ -30,7 +30,7 @@ public class Usuario {
 	public Usuario() {
 		
 	}
-	public boolean usuarioConNull(){
+	public boolean conNull(){
 		boolean hasNull=(this.id==null)||(this.nombre==null)||(this.apellidos==null)||(this.localidad==null)||
 		(this.correo==null);
 
