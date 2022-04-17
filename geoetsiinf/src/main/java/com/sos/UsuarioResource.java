@@ -42,7 +42,7 @@ public class UsuarioResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     public Response registerUsuario(Usuario usuario) throws ClassNotFoundException, SQLException{
-        if(usuario.conNull()){
+        if(usuario==null||usuario.conNull()){
             return Response.status(Response.Status.BAD_REQUEST).entity("Usuario a añadir con uno o varios campos nulos").build();
         } else {
             Class.forName(DRIVER);
@@ -275,7 +275,6 @@ public class UsuarioResource {
                  Statement stmt = conn.createStatement();
                  String sql;
                  sql="UPDATE encuentra SET "
-                 + "ID='"+tesoro.getID()+"',"
                  + "fecha='"+tesoro.getFecha()+"',"
                  + "latitud='"+tesoro.getLatitud()+"',"
                  + "longitud='"+tesoro.getLongitud()+"',"
@@ -283,7 +282,6 @@ public class UsuarioResource {
                  + "dificultad='"+tesoro.getDificultad()+"',"
                  + "tipo_terreno='"+tesoro.getTipo_terreno()+"',"
                  + "pista='"+tesoro.getPista()+"',"
-                 + "ID_usuario='"+id+"',"
                  + ";";
                  stmt.executeUpdate(sql);
              } catch (SQLIntegrityConstraintViolationException ex) {
@@ -513,28 +511,25 @@ public Response resumenUser(@PathParam("ID_Usuario") String idUsuario) throws Cl
 
 }
 
-    private void showDatabases(){
-        Connection conn = null;
-    try {
-        String myConnectionString =
-                "jdbc:mysql://127.0.0.1:3306?" +
-                "useUnicode=yes&characterEncoding=UTF-8";
-        conn = DriverManager.getConnection(myConnectionString, "root", "");
-        Statement stmt = conn.createStatement();
-        stmt.execute("SHOW DATABASES");
-        ResultSet rs = stmt.getResultSet();
-        while (rs.next()) {
-            System.out.println(rs.getString(1));
-        }
-        rs.close();
-        stmt.close();
-        conn.close();
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-    }
-    }
-
-
-    //TODO AMIGOS
+    // private void showDatabases(){
+    //     Connection conn = null;
+    // try {
+    //     String myConnectionString =
+    //             "jdbc:mysql://127.0.0.1:3306?" +
+    //             "useUnicode=yes&characterEncoding=UTF-8";
+    //     conn = DriverManager.getConnection(myConnectionString, "root", "");
+    //     Statement stmt = conn.createStatement();
+    //     stmt.execute("SHOW DATABASES");
+    //     ResultSet rs = stmt.getResultSet();
+    //     while (rs.next()) {
+    //         System.out.println(rs.getString(1));
+    //     }
+    //     rs.close();
+    //     stmt.close();
+    //     conn.close();
+    // } catch (SQLException ex) {
+    //     ex.printStackTrace();
+    // }
+    // }
 
 }
