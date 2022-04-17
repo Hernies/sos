@@ -41,10 +41,10 @@ public class UsuarioResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     public Response registerUsuario(Usuario usuario) throws ClassNotFoundException, SQLException{
-        Class.forName(DRIVER);
         if(usuario.conNull()){
             return Response.status(Response.Status.BAD_REQUEST).entity("Usuario a añadir con uno o varios campos nulos").build();
         } else {
+            Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
                 //añado a la BD mi usuario
                 Statement stmt = conn.createStatement();
@@ -126,7 +126,7 @@ public class UsuarioResource {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         }catch (SQLException e){
-            return Response.status(Response.Status.BAD_REQUEST).entity("o el usuario que buscas no existe o algo has hecho muy mal (quédate con la primera)").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("o el usuario que buscas no existe o algo has hecho muy mal (quédate con la primera)").header("Content-Location", uriInfo.getAbsolutePath()).build();
         }
         return Response.status(Response.Status.OK).entity(usuario).header("Content-Location", uriInfo.getAbsolutePath()).build();
     }
@@ -149,13 +149,13 @@ public class UsuarioResource {
                 "',localidad='"+ usuario.getLocalidad() +
                 "',correo='"+ usuario.getCorreo() +
                 "'edad="+ usuario.getEdad()+
-                " WHERE ID=" + id;
+                "' WHERE ID='" + id + "'";
 
             stmt.executeQuery(sql);
         } catch (SQLException e){
             throw new IllegalStateException("Cannot connect to the database", e);
         }
-         return Response.status(Response.Status.OK).entity("actualizacion de datos hecha correctamente").build();
+         return Response.status(Response.Status.OK).entity("actualizacion de datos hecha correctamente").header("Content-Location", uriInfo.getAbsolutePath()).build();
     }
 
 
@@ -177,7 +177,7 @@ public class UsuarioResource {
         }catch (SQLException e){
             return Response.status(Response.Status.BAD_REQUEST).entity("no se pudo borrar el usuario\n").build();
         }
-        return Response.status(Response.Status.OK).entity("usuario borrado correctamente").build();
+        return Response.status(Response.Status.OK).entity("usuario borrado correctamente").header("Content-Location", uriInfo.getAbsolutePath()).build();
     }
 
 
@@ -185,21 +185,21 @@ public class UsuarioResource {
     @Path("/{usuario_id}/tesoros_añadidos")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response publicarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro) throws ClassNotFoundException, SQLException{
-       Class.forName(DRIVER);
+    public Response publicarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro) throws ClassNotFoundException, SQLException{ 
         if(tesoro.conNull()){
             return Response.status(Response.Status.BAD_REQUEST).entity("Tesoro a añadir con uno o varios campos nulos").build();
         }
-        if(!CorrectQueryParams(tesoro.getTamaño(), tesoro.getDificultad())){
-            return Response.status(Response.Status.BAD_REQUEST).entity("Asegúrate de que el tamaño(pequeño,mediano,grande) y la dificultad(facil,mediano,pequeño) del tesoro son correctas.").build();
-        }
+        // if(!CorrectQueryParams(tesoro.getTamaño(), tesoro.getDificultad())){
+        //     return Response.status(Response.Status.BAD_REQUEST).entity("Asegúrate de que el tamaño(pequeño,mediano,grande) y la dificultad(facil,intermedia,dificil) del tesoro son correctas.").build();
+        // }
         else {
+            Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
                 //añado a la BD mi usuario
                 Statement stmt = conn.createStatement();
                 String sql;
-                sql="INSERT INTO tesoro VALUES("+ tesoro.getFecha() + "', '"+ tesoro.getLatitud()+ "', '"+ 
-                tesoro.getLongitud()+ "','"+tesoro.getTamaño()+ "', '"+tesoro.getDificultad()+"','" +tesoro.getTipo_terreno()+ "','"+tesoro.getID_usuario() +"')";
+                sql="INSERT INTO tesoro (fecha, latitud, longitud, tamaño, dificultad, tipo_terreno, ID_usuario) VALUES ("+ tesoro.getFecha() + ", "+ tesoro.getLatitud()+ ", "+ 
+                tesoro.getLongitud()+ ", '"+tesoro.getTamaño()+ "', '"+tesoro.getDificultad()+"', '" +tesoro.getTipo_terreno()+ "', '"+id+"')";
                 stmt.executeUpdate(sql);
             } catch (SQLIntegrityConstraintViolationException ex) {
                 return Response.status(Response.Status.CONFLICT).entity("tesoro ya existe!").build();
@@ -214,9 +214,9 @@ public class UsuarioResource {
     public Response getTesorosCreadosUsuario(@PathParam("usuario_id") String id, @QueryParam("fecha") Date date, @QueryParam("dificultad") String dificultad, 
     @QueryParam("terreno") String tipo_terreno, @QueryParam("tamaño") String tamaño,@QueryParam("desplazamiento") int desplazamiento, @QueryParam("limite") int limite) throws ClassNotFoundException{
         List<Tesoro> tesorosA = new ArrayList<Tesoro>();
-        if(!CorrectQueryParams(tamaño, dificultad)){
-            return Response.status(Response.Status.BAD_REQUEST).entity("Asegúrate de que el tamaño(pequeño,mediano,grande) y/o la dificultad(facil,mediano,pequeño) del tesoro son correctas.").build();
-        }
+        //if(!CorrectQueryParams(tamaño, dificultad)){
+         //   return Response.status(Response.Status.BAD_REQUEST).entity("Asegúrate de que el tamaño(pequeño,mediano,grande) y/o la dificultad(facil,intermedia,dificil) del tesoro son correctas.").build();
+        //}
         Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
                 //añado a la BD mi usuario
@@ -236,38 +236,37 @@ public class UsuarioResource {
         }
     
     //TODO checar
-     @POST
-     @Path("/{usuario_id}/tesoros_descubiertos")
-     @Consumes(MediaType.APPLICATION_JSON)
-     @Produces(MediaType.APPLICATION_JSON)
-     public Response encontrarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro, Date fecha) throws ClassNotFoundException, SQLException{
-       Class.forName(DRIVER);
+    @POST
+    @Path("/{usuario_id}/tesoros_descubiertos")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response encontrarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro, @QueryParam("fecha") Date date) throws ClassNotFoundException, SQLException{
+       
         if(tesoro.conNull()){
             return Response.status(Response.Status.BAD_REQUEST).entity("Tesoro a añadir con uno o varios campos nulos").build();
         }
-        if(!CorrectQueryParams(tesoro.getTamaño(), tesoro.getDificultad())){
-            return Response.status(Response.Status.BAD_REQUEST).entity("Asegúrate de que el tamaño(pequeño,mediano,grande) y la dificultad(facil,mediano,pequeño) del tesoro son correctas.").build();
-        }
-        else {
+        Class.forName(DRIVER);
+        
+
             try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
                 //añado a la BD un tesoro descubierto por el usuario
                 Statement stmt = conn.createStatement();
                 String sql;
-                sql="INSERT INTO encuentra VALUES("+ fecha + "', '"+ id + "', '" + tesoro.getId()+"')";
+                sql="INSERT INTO encuentra VALUES("+ date + "', '"+ id + "', '" + tesoro.getId()+"')";
                 stmt.executeUpdate(sql);
             } catch (SQLIntegrityConstraintViolationException ex) {
                 return Response.status(Response.Status.CONFLICT).entity("encuentra ya existe!").build();
             } 
             return Response.status(Response.Status.OK).entity(tesoro).header("Location", uriInfo.getAbsolutePath()+"/"+id).build();
-        }
+        
      }
 
-/*
-     @GET
-     @Path("/{usuario_id}/tesoros_descubiertos")
-     @Produces(MediaType.APPLICATION_JSON)
-     public List<Tesoro> getTesorosEncontradoUsuario(@PathParam("usuario_id") String id, @QueryParam("string") String string, @QueryParam("fecha") Date date, 
-     @QueryParam("desplazamiento") int desplazamiento, @QueryParam("terreno") String terreno, @QueryParam("dificultad") int dificultad){
+
+    @GET
+    @Path("/{usuario_id}/tesoros_descubiertos")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTesorosEncontradoUsuario(@PathParam("usuario_id") String id, @QueryParam("fecha") Date date, @QueryParam("dificultad") String dificultad, 
+    @QueryParam("terreno") String tipo_terreno, @QueryParam("tamaño") String tamaño,@QueryParam("desplazamiento") int desplazamiento, @QueryParam("limite") int limite) throws ClassNotFoundException{
         List<Tesoro> tesorosA = new ArrayList<Tesoro>();
         // if(!CorrectQueryParams(tamaño, dificultad)){
         //     return Response.status(Response.Status.BAD_REQUEST).entity("Asegúrate de que el tamaño(pequeño,mediano,grande) y/o la dificultad(facil,mediano,pequeño) del tesoro son correctas.").build();
@@ -277,7 +276,7 @@ public class UsuarioResource {
                 //añado a la BD mi usuario
                 Statement stmt = conn.createStatement();
                 String sql;
-                sql= buildQuery(id,date,dificultad,desplazamiento);
+                sql= buildQuery(id,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
                 ResultSet rs = stmt.executeQuery(sql);
                 while(rs.next()){
                     Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getDate("fecha"), rs.getLong("latitud"), rs.getLong("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("ID_usuario"));
@@ -287,12 +286,83 @@ public class UsuarioResource {
                 throw new IllegalStateException("Cannot connect to the database", ex);
                 //return Response.status(Response.Status.CONFLICT).entity("tesoro ya existe!").build();
             }
-            return Response.status(Response.Status.OK).entity(tesorosA).header("Location", uriInfo.getAbsolutePath()+"/"+id).build();
-        
-         List<Tesoro> tesoros = new ArrayList<Tesoro>();
-         return tesoros;
-     }*/
+            return Response.status(Response.Status.OK).entity(tesorosA).header("Location", uriInfo.getAbsolutePath()+"/"+id).build();          
+     }
 
+
+    @DELETE
+    @Path("/{ID_Usuario}/amigos/{ID_Amigo}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response deleteAmigo (@PathParam("ID_Usuario") String idUser, @PathParam("ID_Usuario") String idAmigo) throws ClassNotFoundException{
+        
+        Class.forName(DRIVER);
+        try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
+            //borro de la BD mi usuario
+            Statement stmt = conn.createStatement();
+            String sql;
+            sql="DELETE FROM es_amigo WHERE ID_usuario_1='"+idUser+"' AND ID_usuario_2 ='"+idAmigo+"'";
+            stmt.executeUpdate(sql);
+        }catch (SQLException e){
+            return Response.status(Response.Status.BAD_REQUEST).entity("no se pudo borrar el Amigo\n").build();
+        }
+        return Response.status(Response.Status.OK).entity("Amigo borrado correctamente").build();
+    }
+
+    @POST
+    @Path("/{usuario_id}/amigos")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response añadirAmigo(@PathParam("usuario_id") String id, @QueryParam("id_Amigo") String idAmigo)throws ClassNotFoundException, SQLException{
+        if(idAmigo==null){
+            return Response.status(Response.Status.BAD_REQUEST).entity("Debe introducir el identificador del usuario que quiere añadir a su lista de amigos").build();
+        }
+        Class.forName(DRIVER);
+        try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
+               //añado a la BD un tesoro descubierto por el usuario
+            Statement stmt = conn.createStatement();
+            String sql;
+            sql="INSERT INTO es_amigo(`ID_usuario_1`,`ID_usuario_2`) VALUES('" + id + "', '" + idAmigo + "')";
+            stmt.executeUpdate(sql);
+        } catch (SQLIntegrityConstraintViolationException ex) {
+            return Response.status(Response.Status.CONFLICT).entity("ese amigo ya se encuentra en tu lista de amigos o no existe!").build();
+          } 
+          return Response.status(Response.Status.OK).entity("Amigo añadido correctamente!").header("Location", uriInfo.getAbsolutePath()+"/"+idAmigo).build();
+    }
+
+
+    @GET
+    @Path("/{ID_Usuario}/amigos")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getAmigos(@PathParam("ID_Usuario") String id, @QueryParam("id_Amigo") String idAmigo, @QueryParam("desplazamiento") int desplazamiento,
+     @QueryParam("limite") int limite) throws ClassNotFoundException{
+        List<String> amigos = new ArrayList<String>();
+        Class.forName(DRIVER);
+        try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
+               //añado a la BD un tesoro descubierto por el usuario
+            Statement stmt = conn.createStatement();
+            String sql;
+            if(idAmigo==null){
+                sql ="SELECT * FROM geoetsiinf.es_amigo";
+            }
+            else{
+                sql = "SELECT * FROM geoetsiinf.es_amigo WHERE ID_usuario_1='"+id+"' AND ID_usuario_2 LIKE '%" + idAmigo +"%'";
+                if (limite>=1){
+                    sql += "LIMIT " + limite;
+                }
+                if(desplazamiento>=1){
+                    sql +=  " OFFSET " + desplazamiento;
+                }
+            }
+                ResultSet rs = stmt.executeQuery(sql);
+            while(rs.next()){
+                String ID = rs.getString("ID_usuario_2 ");
+                amigos.add(ID);
+            }
+        } catch (SQLException e){
+            //potencial e.getCause para comprobar errores y dar returns adecuados? DEFINITIVAMENTE
+            throw new IllegalStateException("Cannot connect to the database", e);
+        } 
+        return Response.status(Response.Status.OK).entity(amigos).build();
+    }
 
     // @GET
     // @Path("/{usuario_id}/resumen")
@@ -304,39 +374,26 @@ public class UsuarioResource {
 
     
     private String buildQuery(String id, Date date, String dificultad, String tipo_terreno, String tamaño,
-             int desplazamiento, int limite) {
-        String query="SELECT * FROM tesoro WHERE (tesoro.ID_usuario LIKE '% "+ id +" %')";
-            if(date!=null){
-                query += "AND (tesoro.fecha < '"+ date +"')";
-            }
-            if(dificultad!=null){
-                query+= "AND (tesoro.dificultad= '"+ dificultad +"')";  
-            }
-            if(tipo_terreno!=null){
-                query += "AND (tesoro.tipo_terreno= '"+tipo_terreno+"')";
-            }
-            if(tamaño!=null){
-            query += "AND (tesoro.tamaño = '"+tamaño+"')";
-            }
-            if (limite>=1){
-                query += "LIMIT " + limite;
-            }
-            if(desplazamiento>=1){
-                query +=  " OFFSET " + desplazamiento;
-            }
-        return query;
-    }
-    //NO ESTAMOS DICIENDO NADA SUBNORMAL
-    //ES POR TU CONFIGURACIÓN DE OUTPUTS DE SONIDO
-    //ARREGLALO Y MUTEATE SUBNORMAL
-
-    private boolean CorrectQueryParams(String tamaño, String dificultad){
-
-        boolean correctTamaño= (tamaño==null) || "pequeño".equalsIgnoreCase(tamaño) || "mediano".equalsIgnoreCase(tamaño) || "grande".equalsIgnoreCase(tamaño);
-        boolean correctDificultad = (tamaño==null) || "facil".equalsIgnoreCase(dificultad) || "intermedio".equalsIgnoreCase(dificultad) || "dificil".equalsIgnoreCase(dificultad);
-
-        return correctTamaño && correctDificultad;
-    }
+    int desplazamiento, int limite) {
+    String query="SELECT * FROM tesoro WHERE (tesoro.ID_usuario LIKE '% "+ id +" %')";
+        if(date!=null){
+            query += "AND (z.fecha < '"+ date +"')";
+        }else if(dificultad!=null){
+            query+= "AND (z.dificultad= '"+ dificultad +"')";  
+        }else if(tipo_terreno!=null){
+            query += "AND (z.tipo_terreno= '"+tipo_terreno+"')";
+        }else if(tamaño!=null){
+        query += "AND (z.tamaño = '"+tamaño+"')";
+        }
+        if (limite>=1){
+            query += "LIMIT " + limite;
+        }
+        if(desplazamiento>=1){
+            query +=  " OFFSET " + desplazamiento;
+        }
+    return query+=";";
+}
+ 
     
 
 

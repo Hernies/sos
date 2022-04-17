@@ -12,8 +12,7 @@ public class Usuario {
 	private String localidad;
 	private String correo;
 	private int edad;
-	private List<Tesoro> tesoros_añadidos;
-	private List<Tesoro> tesoros_descubiertos;
+
 	
 	public Usuario(String ID, String nombre, String apellidos, String localidad, String correo, int edad) {
 		super();
@@ -23,8 +22,6 @@ public class Usuario {
 		this.localidad = localidad;
 		this.correo = correo;
 		this.edad = edad;
-		tesoros_añadidos = new ArrayList<Tesoro>();
-		tesoros_descubiertos = new ArrayList<Tesoro>();
 	}
 	
 	public Usuario() {
@@ -72,16 +69,4 @@ public class Usuario {
 	public void setEdad(int edad) {
 		this.edad = edad;
 	}
-    public List<Tesoro> getTesoros_añadidos() {
-        return tesoros_añadidos;
-    }
-    public void setTesoros_añadidos(List<Tesoro> tesoros_añadidos) {
-        this.tesoros_añadidos = tesoros_añadidos;
-    }
-    public List<Tesoro> getTesoros_descubiertos() {
-        return tesoros_descubiertos;
-    }
-    public void setTesoros_descubiertos(List<Tesoro> tesoros_descubiertos) {
-        this.tesoros_descubiertos = tesoros_descubiertos;
-    }
 }

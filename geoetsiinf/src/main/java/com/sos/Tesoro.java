@@ -1,5 +1,7 @@
 package com.sos;
 import java.util.Date;
+import java.time.*;
+import javax.json.bind.annotation.JsonbDateFormat;
 
 
 public class Tesoro {
@@ -16,14 +18,14 @@ public class Tesoro {
 	public Tesoro(int id, Date fecha, float f, float g, String tamaño, String dificultad,
 			String tipo_terreno, String iD_usuario) {
 		super();
-		//this.id = id;
+		this.id = id;
 		this.fecha = fecha;
 		this.latitud = f;
 		this.longitud = g;
 		this.tamaño = tamaño;
 		this.dificultad = dificultad;
 		this.tipo_terreno = tipo_terreno;
-		ID_usuario = iD_usuario;
+		this.ID_usuario = iD_usuario;
 	}
 	
 	public Tesoro() {
