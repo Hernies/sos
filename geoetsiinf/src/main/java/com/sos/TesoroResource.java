@@ -27,7 +27,7 @@ import javax.ws.rs.core.UriInfo;
 
 
 
-@Path("/tesoros")
+@Path("/tesoros/near")
 public class TesoroResource {
     
     @Context
@@ -37,7 +37,6 @@ public class TesoroResource {
     static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
     @GET
-    @Path("/near")
     @Produces(MediaType.APPLICATION_JSON)
     public Response nearTesoro(@QueryParam("latitud") Long latitud,@QueryParam("longitud") Long longitud, @QueryParam("fecha") Date date, @QueryParam("dificultad") String dificultad, 
     @QueryParam("terreno") String tipo_terreno, @QueryParam("tamaño") String tamaño,@QueryParam("desplazamiento") int desplazamiento, @QueryParam("limite") int limite) throws ClassNotFoundException{
@@ -70,7 +69,6 @@ public class TesoroResource {
             return Response.status(Response.Status.OK).entity(tesorosA).header("Location", uriInfo.getAbsolutePath()).build();
         }
     
-
     private String buildQuery(String sql, Date date, String dificultad, String tipo_terreno, String tamaño,
     int desplazamiento, int limite) {
     //añade a la query el filtro deseado
