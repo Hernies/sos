@@ -13,10 +13,11 @@ public class Tesoro {
 	private String tamaño;
 	private String dificultad;
 	private String tipo_terreno;
+	private String pista;
 	private String ID_usuario;
 	
 	public Tesoro(int id, Date fecha, float f, float g, String tamaño, String dificultad,
-			String tipo_terreno, String iD_usuario) {
+			String tipo_terreno,String pista ,String iD_usuario) {
 		super();
 		this.id = id;
 		this.fecha = fecha;
@@ -25,6 +26,7 @@ public class Tesoro {
 		this.tamaño = tamaño;
 		this.dificultad = dificultad;
 		this.tipo_terreno = tipo_terreno;
+		this.pista = pista;
 		this.ID_usuario = iD_usuario;
 	}
 	

@@ -376,26 +376,103 @@ public class UsuarioResource {
     private String buildQuery(String id, Date date, String dificultad, String tipo_terreno, String tamaño,
     int desplazamiento, int limite) {
     String query="SELECT * FROM tesoro WHERE (tesoro.ID_usuario LIKE '% "+ id +" %')";
-        if(date!=null){
-            query += "AND (z.fecha < '"+ date +"')";
-        }else if(dificultad!=null){
-            query+= "AND (z.dificultad= '"+ dificultad +"')";  
-        }else if(tipo_terreno!=null){
-            query += "AND (z.tipo_terreno= '"+tipo_terreno+"')";
-        }else if(tamaño!=null){
+    if(date!=null){
+        query += "AND (z.fecha < '"+ date +"')";
+    }else if(dificultad!=null){
+        query+= "AND (z.dificultad= '"+ dificultad +"')";  
+    }else if(tipo_terreno!=null){
+        query += "AND (z.tipo_terreno= '"+tipo_terreno+"')";
+    }else if(tamaño!=null){
         query += "AND (z.tamaño = '"+tamaño+"')";
-        }
-        if (limite>=1){
-            query += "LIMIT " + limite;
-        }
-        if(desplazamiento>=1){
-            query +=  " OFFSET " + desplazamiento;
-        }
+    }
+    if (limite>=1){
+        query += "LIMIT " + limite;
+    }
+    if(desplazamiento>=1){
+        query +=  " OFFSET " + desplazamiento;
+    }
     return query+=";";
 }
  
     
+@GET
+@Path("/{ID_Usuario}/resumen")
+@Produces(MediaType.APPLICATION_JSON)
+public Response resumenUser(@PathParam("ID_Usuario") String idUsuario) throws ClassNotFoundException{
+    
+    Resumen resumen;//el resumen va a estar compuesto porlos siguientes elementos:
+        Usuario datos=new Usuario();//datos del perfil del usuario
+        ArrayList<Tesoro> tesorosEncontrados = new ArrayList<Tesoro>();//ultimos 5 tesoros encontrados
+        int nTesorosEncontrados=0;//numero de tesoros encontrados por el usuario
+        int numeroAmigos=0;//numero de amigos que tiene el usuario
+        int numTesorosañadidos=0; //numero de tesoros que ha añadido el usuario
+    
+    Class.forName(DRIVER);
+    
+    try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
 
+        //Cogemos los datos del usuario
+        Statement informacion = conn.createStatement();
+        String sqlInforUser;
+        sqlInforUser="SELECT  FROM encuentra WHERE ID_usuario= '" + idUsuario +"';";
+        ResultSet rsUser = informacion.executeQuery(sqlInforUser);
+        if(rsUser.next())
+            datos = new Usuario(rsUser.getString("ID"),
+                            rsUser.getString("nombre"),
+                            rsUser.getString("apellidos"),
+                            rsUser.getString("localidad"),
+                            rsUser.getString("correo"),
+                            rsUser.getInt("edad"));
+
+        //cogemos los 5 primeros tesoros de la tabla de tesoros encontrados por este user
+        Statement listaTesoros = conn.createStatement();
+        String sqlLista;
+        sqlLista="SELECT TOP 5 FROM encuentra INNER JOIN tesoro ON encuentra.ID_tesoro= tesoro.ID_tesoro WHERE ID_usuario= '" + idUsuario +"' ORDER BY fecha;";
+        ResultSet rsLista = listaTesoros.executeQuery(sqlLista);
+        while(rsLista.next()){
+                Tesoro tesoro = new Tesoro(rsLista.getInt("ID"),
+                            rsLista.getDate("fecha"), 
+                            rsLista.getLong("latitud"), 
+                            rsLista.getLong("longitud"), 
+                            rsLista.getString("tamaño"), 
+                            rsLista.getString("dificultad"), 
+                            rsLista.getString("tipo_terreno"),
+                            rsLista.getString("ID_usuario"));
+                tesorosEncontrados.add(tesoro);
+        }
+        
+        //contamos la cantidad de filas que tiene la tabla encuentra para el usuario dado
+        Statement encontradosPorUser = conn.createStatement();
+        String sqlNEncontrados;
+        sqlNEncontrados="SELECT COUNT(ID_tesoro) FROM encuentra WHERE ID_usuario= '" + idUsuario +"';";
+        ResultSet rsFound = encontradosPorUser.executeQuery(sqlNEncontrados);
+        if(rsFound.next())
+            nTesorosEncontrados=rsFound.getInt(1); 
+        
+        //contamos la cantidad de amigos que tiene el usuario añadidos en el sistema
+        Statement amiguetes = conn.createStatement();
+        String sqlNAmigos;
+        sqlNAmigos="SELECT COUNT(ID_tesoro) FROM es_amigo WHERE ID_usuario_1= '" + idUsuario +"';";
+        ResultSet rsAmigos = amiguetes.executeQuery(sqlNAmigos);
+        if(rsAmigos.next())
+            numeroAmigos=rsAmigos.getInt(1);
+
+        //contamos la cantidad de tesoro que el usuario ha añadido en el sistema
+        Statement añadidos = conn.createStatement();
+        String sqlNAñadidos;
+        sqlNAñadidos="SELECT COUNT(ID_tesoro) FROM tesoro WHERE ID_usuario= '" + idUsuario +"';";
+        ResultSet rsAdded = añadidos.executeQuery(sqlNAñadidos);
+        while(rsAdded.next()){
+            numTesorosañadidos=rsAdded.getInt(1);
+        }
+        resumen=new Resumen(datos,tesorosEncontrados,nTesorosEncontrados,numeroAmigos,numTesorosañadidos);
+    }
+    catch (SQLException e){
+        throw new IllegalStateException("uh uh... stinky stinky....", e);
+    } 
+    return Response.status(Response.Status.OK).entity(resumen).build();
+
+}
 
     private void showDatabases(){
         Connection conn = null;
