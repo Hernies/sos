@@ -225,7 +225,7 @@ public class UsuarioResource {
                 sql= buildQuery(id,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
                 ResultSet rs = stmt.executeQuery(sql);
                 while(rs.next()){
-                    Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getDate("fecha"), rs.getFloat("latitud"), rs.getFloat("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("ID_usuario"));
+                    Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getDate("fecha"), rs.getFloat("latitud"), rs.getFloat("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("pista"),rs.getString("ID_usuario"));
                     tesorosA.add(tesoro);
                 }
             } catch (SQLException ex) {
@@ -279,7 +279,7 @@ public class UsuarioResource {
                 sql= buildQuery(id,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
                 ResultSet rs = stmt.executeQuery(sql);
                 while(rs.next()){
-                    Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getDate("fecha"), rs.getLong("latitud"), rs.getLong("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("ID_usuario"));
+                    Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getDate("fecha"), rs.getLong("latitud"), rs.getLong("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("pista"),rs.getString("ID_usuario"));
                     tesorosA.add(tesoro);
                 }
             } catch (SQLException ex) {
