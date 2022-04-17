@@ -437,6 +437,7 @@ public Response resumenUser(@PathParam("ID_Usuario") String idUsuario) throws Cl
                             rsLista.getString("tamaño"), 
                             rsLista.getString("dificultad"), 
                             rsLista.getString("tipo_terreno"),
+                            rsLista.getString("pista"),
                             rsLista.getString("ID_usuario"));
                 tesorosEncontrados.add(tesoro);
         }
