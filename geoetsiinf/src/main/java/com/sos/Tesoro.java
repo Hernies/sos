@@ -87,4 +87,12 @@ public class Tesoro {
 	public void setID_usuario(String iD_usuario) {
 		ID_usuario = iD_usuario;
 	}
+
+    public String getID() {
+        return null;
+    }
+
+	public String getPista() {
+		return null;
+	}
 }

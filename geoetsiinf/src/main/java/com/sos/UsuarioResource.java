@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.decorator.Delegate;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -221,8 +222,8 @@ public class UsuarioResource {
             try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
                 //añado a la BD mi usuario
                 Statement stmt = conn.createStatement();
-                String sql;
-                sql= buildQuery(id,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
+                String sql="SELECT * FROM tesoro WHERE (tesoro.ID_usuario LIKE '% "+ id +" %')";
+                sql= buildQuery(sql,id,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
                 ResultSet rs = stmt.executeQuery(sql);
                 while(rs.next()){
                     Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getDate("fecha"), rs.getFloat("latitud"), rs.getFloat("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("pista"),rs.getString("ID_usuario"));
@@ -234,6 +235,8 @@ public class UsuarioResource {
             }
             return Response.status(Response.Status.OK).entity(tesorosA).header("Location", uriInfo.getAbsolutePath()+"/"+id).build();
         }
+
+        
     
     //TODO checar
     @POST
@@ -246,8 +249,6 @@ public class UsuarioResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("Tesoro a añadir con uno o varios campos nulos").build();
         }
         Class.forName(DRIVER);
-        
-
             try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
                 //añado a la BD un tesoro descubierto por el usuario
                 Statement stmt = conn.createStatement();
@@ -260,6 +261,54 @@ public class UsuarioResource {
             return Response.status(Response.Status.OK).entity(tesoro).header("Location", uriInfo.getAbsolutePath()+"/"+id).build();
         
      }
+     @PUT
+     @Path("/{usuario_id}/tesoros_añadidos")
+     @Consumes(MediaType.APPLICATION_JSON)
+     @Produces(MediaType.APPLICATION_JSON)
+     public Response actualizarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro, @QueryParam("fecha") Date date) throws ClassNotFoundException, SQLException{
+         if(tesoro.conNull()){
+             return Response.status(Response.Status.BAD_REQUEST).entity("Tesoro a actualizar con uno o varios campos nulos").build();
+         }
+         Class.forName(DRIVER);
+             try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
+                 //añado a la BD un tesoro descubierto por el usuario
+                 Statement stmt = conn.createStatement();
+                 String sql;
+                 sql="UPDATE encuentra SET "
+                 + "ID='"+tesoro.getID()+"',"
+                 + "fecha='"+tesoro.getFecha()+"',"
+                 + "latitud='"+tesoro.getLatitud()+"',"
+                 + "longitud='"+tesoro.getLongitud()+"',"
+                 + "tamaño='"+tesoro.getTamaño()+"',"
+                 + "dificultad='"+tesoro.getDificultad()+"',"
+                 + "tipo_terreno='"+tesoro.getTipo_terreno()+"',"
+                 + "pista='"+tesoro.getPista()+"',"
+                 + "ID_usuario='"+id+"',"
+                 + ";";
+                 stmt.executeUpdate(sql);
+             } catch (SQLIntegrityConstraintViolationException ex) {
+                 return Response.status(Response.Status.CONFLICT).entity("tesoro no pudo ser modificado").build();
+             } 
+             return Response.status(Response.Status.OK).entity(tesoro).header("Location", uriInfo.getAbsolutePath()+"/"+id).build();
+         
+      }
+
+    @DELETE
+    @Path("/{usuario_id}/tesoros_añadidos")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response removeTesoroTesorosAñadidos(@PathParam("usuario_id") String id, @QueryParam("tesoro_id") int tesoro_id) throws ClassNotFoundException{
+        Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
+                //añado a la BD un tesoro descubierto por el usuario
+                Statement stmt = conn.createStatement();
+                String sql;
+                sql="DELETE * FROM geoetsiinf.tesoros WHERE ID='"+tesoro_id +"' AND ID_usuario='"+id+"' ;";
+                stmt.executeUpdate(sql);
+            } catch (SQLException ex) {
+                return Response.status(Response.Status.CONFLICT).entity("tesoro no pudo ser borrado").build();
+            } 
+        return Response.status(Response.Status.OK).entity("tesoro borrado correctamente").header("Location", uriInfo.getAbsolutePath()).build();
+    }
 
 
     @GET
@@ -273,10 +322,9 @@ public class UsuarioResource {
         // }
         Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
-                //añado a la BD mi usuario
                 Statement stmt = conn.createStatement();
-                String sql;
-                sql= buildQuery(id,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
+                String sql="SELECT * FROM encuentra WHERE (tesoro.ID_usuario='"+ id +"')";
+                sql=buildQuery(sql,id,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
                 ResultSet rs = stmt.executeQuery(sql);
                 while(rs.next()){
                     Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getDate("fecha"), rs.getLong("latitud"), rs.getLong("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("pista"),rs.getString("ID_usuario"));
@@ -297,7 +345,6 @@ public class UsuarioResource {
         
         Class.forName(DRIVER);
         try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
-            //borro de la BD mi usuario
             Statement stmt = conn.createStatement();
             String sql;
             sql="DELETE FROM es_amigo WHERE ID_usuario_1='"+idUser+"' AND ID_usuario_2 ='"+idAmigo+"'";
@@ -317,7 +364,7 @@ public class UsuarioResource {
         }
         Class.forName(DRIVER);
         try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
-               //añado a la BD un tesoro descubierto por el usuario
+               //añado a la BD un amigo del usuario
             Statement stmt = conn.createStatement();
             String sql;
             sql="INSERT INTO es_amigo(`ID_usuario_1`,`ID_usuario_2`) VALUES('" + id + "', '" + idAmigo + "')";
@@ -337,7 +384,6 @@ public class UsuarioResource {
         List<String> amigos = new ArrayList<String>();
         Class.forName(DRIVER);
         try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
-               //añado a la BD un tesoro descubierto por el usuario
             Statement stmt = conn.createStatement();
             String sql;
             if(idAmigo==null){
@@ -364,18 +410,10 @@ public class UsuarioResource {
         return Response.status(Response.Status.OK).entity(amigos).build();
     }
 
-    // @GET
-    // @Path("/{usuario_id}/resumen")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // public Response resumen(@PathParam("usuario_id") String id){
-    //     return null;
-
-    // }
-
     
-    private String buildQuery(String id, Date date, String dificultad, String tipo_terreno, String tamaño,
+    private String buildQuery(String sql,String id, Date date, String dificultad, String tipo_terreno, String tamaño,
     int desplazamiento, int limite) {
-    String query="SELECT * FROM tesoro WHERE (tesoro.ID_usuario LIKE '% "+ id +" %')";
+    String query="";
     if(date!=null){
         query += "AND (z.fecha < '"+ date +"')";
     }else if(dificultad!=null){
