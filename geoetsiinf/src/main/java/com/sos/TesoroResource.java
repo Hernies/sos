@@ -21,6 +21,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -30,7 +31,9 @@ import javax.ws.rs.core.UriInfo;
 public class TesoroResource {
     
     @Context
-    private UriInfo uriInfo;
+    UriInfo uriInfo;
+    @Context
+    Request request;
     
     private String url = "jdbc:mysql://localhost:3306/geoetsiinf";
     static final String DRIVER = "com.mysql.cj.jdbc.Driver";

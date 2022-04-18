@@ -23,6 +23,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -33,14 +34,16 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 public class UsuarioResource {
 
     @Context
-    private UriInfo uriInfo;
-    
+    UriInfo uriInfo;
+    @Context
+    Request request;
+
     private String url = "jdbc:mysql://localhost:3306/geoetsiinf";
     static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response registerUsuario(Usuario usuario) throws ClassNotFoundException, SQLException{
         if(usuario==null||usuario.conNull()){
             return Response.status(Response.Status.BAD_REQUEST).entity("Usuario a añadir con uno o varios campos nulos").build();
@@ -61,7 +64,7 @@ public class UsuarioResource {
                 throw new IllegalStateException("Cannot connect to the database", e);
             }
         }
-        return Response.status(Response.Status.OK).entity("Usuario añadido correctamente!").header("Location", uriInfo.getAbsolutePath()+"/"+usuario.getId()).build();
+        return Response.status(Response.Status.OK).entity("Usuario añadido correctamente!").header("Location", uriInfo.getAbsolutePath()+usuario.getId()).build();
     }
     
 

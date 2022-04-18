@@ -13,6 +13,7 @@
     <build>
         <finalName>geoetsiinf</finalName>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -23,6 +24,8 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
+            
         </plugins>
     </build>
 
@@ -39,6 +42,13 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-servlet-initializer</artifactId>
+            <version>6.1.0.Alpha1</version>
+        </dependency>
+
 
         <dependency>
             <groupId>mysql</groupId>

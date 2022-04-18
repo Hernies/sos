@@ -1,13 +1,17 @@
 package com.sos;
+
 import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+
+import jakarta.ws.rs.client.WebTarget;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 //import javax.ws.rs.client.WebTarget;
-//import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientConfig;
 //import org.json.*;
 
 
@@ -16,23 +20,24 @@ public class test {
     public static void main(String[] args) {
     Client client = ClientBuilder.newClient();
 
-
     // POST usuarios
     String Json = " \"ID\": \"User1\",\"nombre\": \"Luca\",\"apellidos\": \"Cotan Drulea\",\"localidad\": \"Madrid\",\"correo\": \"cotiCotan@gmail.com\",\"edad\": 21";
 
-    Response res1 = client.target(getBaseURI()).
-                    path("/usuarios").
+    Usuario u = new Usuario("User1","Luca","Cotan Drulea","Madrid","cotiCotan@gmail.com",21);
+    Response res1 = client.target(getBaseURI()).path("usuarios").
                     request().accept(MediaType.APPLICATION_JSON).
-                    post(Entity.json(Json));
-
+                    post(Entity.entity(u,MediaType.APPLICATION_JSON));
+    
+    
     System.out.println("respuesta POST usuarios: " + res1.getStatus() + "\n" +res1.getEntity());
+    System.out.println("URI: " + getBaseURI().toString()+"usuarios");
     System.out.println("\n\n");
 
 
     // Get usuarios 
     // TODO restriccion con usuario? merece la pena? es lo mismo q lo de abajo
     String res2 = client.target(getBaseURI()).
-                    path("/usuarios").
+                    path("usuarios").
                     request().accept(MediaType.APPLICATION_JSON).
                     get(String.class);
 
@@ -42,7 +47,7 @@ public class test {
 
     // GET usuarios/id
     String res3 = client.target(getBaseURI()).
-                    path("/usuarios/User1").
+                    path("usuarios/User1").
                     request().accept(MediaType.APPLICATION_JSON).
                     get(String.class);
 
@@ -76,7 +81,7 @@ public class test {
     Json = " \"ID\": \"User1\",\"nombre\": \"Luca\",\"apellidos\": \"Cotan Drulea\",\"localidad\": \"Madrid\",\"correo\": \"cotiCotan@gmail.com\",\"edad\": 21";
 
     Response res6 = client.target(getBaseURI()).
-                    path("/usuarios").
+                    path("usuarios").
                     request().accept(MediaType.APPLICATION_JSON).
                     post(Entity.json(Json));
 
@@ -86,7 +91,7 @@ public class test {
     Json = " \"ID\": \"User2\",\"nombre\": \"nom2\",\"apellidos\": \"ap2\",\"localidad\": \"loc2\",\"correo\": \"co2\",\"edad\": 2";
 
     Response res7 = client.target(getBaseURI()).
-                    path("/usuarios").
+                    path("usuarios").
                     request().accept(MediaType.APPLICATION_JSON).
                     post(Entity.json(Json));
 
@@ -96,7 +101,7 @@ public class test {
     Json = " \"ID\": \"User3\",\"nombre\": \"nom3\",\"apellidos\": \"ap3\",\"localidad\": \"loc3\",\"correo\": \"co3\",\"edad\": 3";
 
     Response res71 = client.target(getBaseURI()).
-                    path("/usuarios").
+                    path("usuarios").
                     request().accept(MediaType.APPLICATION_JSON).
                     post(Entity.json(Json));
 
@@ -108,7 +113,7 @@ public class test {
     Json = "\"fecha\": 2022-04-02,\"latitud\": 41.40338,\"longitud\": 2.17403,\"tamaño\": \"grande\",\"dificultad\": \"difícil\",\"terreno\": \"calizo\",\"pista\": \"a\",\"ID\": 1";
     
     Response res81 = client.target(getBaseURI()).
-                    path("/usuarios/User1/tesoros_añadidos").
+                    path("usuarios/User1/tesoros_añadidos").
                     request().accept(MediaType.APPLICATION_JSON).
                     post(Entity.json(Json));
 
@@ -118,7 +123,7 @@ public class test {
     Json = "\"fecha\": 2022-04-02,\"latitud\": 40.40338,\"longitud\": 1.17403,\"tamaño\": \"grande\",\"dificultad\": \"facil\",\"terreno\": \"calizo\",\"pista\": \"aa\",\"ID\": 2";
     
     Response res82 = client.target(getBaseURI()).
-                    path("/usuarios/User1/tesoros_añadidos").
+                    path("usuarios/User1/tesoros_añadidos").
                     request().accept(MediaType.APPLICATION_JSON).
                     post(Entity.json(Json));
 
@@ -128,7 +133,7 @@ public class test {
     Json = "\"fecha\": 2022-04-02,\"latitud\": 39.40338,\"longitud\": 0.17403,\"tamaño\": \"mediano\",\"dificultad\": \"difícil\",\"terreno\": \"calizo\",\"pista\": \"aaa\",\"ID\": 3";
     
     Response res83 = client.target(getBaseURI()).
-                    path("/usuarios/User1/tesoros_añadidos").
+                    path("usuarios/User1/tesoros_añadidos").
                     request().accept(MediaType.APPLICATION_JSON).
                     post(Entity.json(Json));
 
@@ -137,7 +142,7 @@ public class test {
 
     // GET /tesoros/nearCoord
     String res18 = client.target(getBaseURI()).
-                    path("/tesoros/nearCoord?fecha=2022-04-02&latitud=40&longitud=1&terreno=calizo&limite=3").
+                    path("tesoros/nearCoord?fecha=2022-04-02&latitud=40&longitud=1&terreno=calizo&limite=3").
                     request().accept(MediaType.APPLICATION_JSON).
                     get(String.class);    
     System.out.println("respuesta GET lista tesoros añadidos: "+res18);
@@ -147,7 +152,7 @@ public class test {
     // el date parece que no hace nada
     // TODO se pueden poner mas filtros con desplazamiento y limite pero no veo como afecta en la bbdd
     String res91 = client.target(getBaseURI()).
-                    path("/usuarios/User1/tesoros_añadidos/1?&fecha=2022-04-02").
+                    path("usuarios/User1/tesoros_añadidos/1?&fecha=2022-04-02").
                     request().accept(MediaType.APPLICATION_JSON).
                     get(String.class);
     
@@ -155,7 +160,7 @@ public class test {
     System.out.println("\n\n");
 
     String res92 = client.target(getBaseURI()).
-                    path("/usuarios/User1/tesoros_añadidos/1?&fecha=2022-04-02&dificultad=difícil&terreno=calizo&tamaño=grande").
+                    path("usuarios/User1/tesoros_añadidos/1?&fecha=2022-04-02&dificultad=difícil&terreno=calizo&tamaño=grande").
                     request().accept(MediaType.APPLICATION_JSON).
                     get(String.class);
     
@@ -167,7 +172,7 @@ public class test {
     Json = "\"fecha\": 2022-04-01,\"latitud\": 20.40338,\"longitud\": 2.27403,\"tamaño\": \"mediano\",\"dificultad\": \"facil\",\"terreno\": \"calizo\",\"pista\": \"aa\",\"ID\": 2";
     
     Response res16 = client.target(getBaseURI()).
-                    path("/usuarios/User1/tesoros_añadidos").
+                    path("usuarios/User1/tesoros_añadidos").
                     request().accept(MediaType.APPLICATION_JSON).
                     post(Entity.json(Json));
 
@@ -179,7 +184,7 @@ public class test {
     Json = "\"fecha\": 2022-04-02,\"latitud\": 41.40338,\"longitud\": 2.17403,\"tamaño\": \"grande\",\"dificultad\": \"difícil\",\"terreno\": \"calizo\",\"pista\": \"a\",\"ID\": 1";
     
     Response res10 = client.target(getBaseURI()).
-                    path("/usuarios/User1/tesoros_descubiertos?fecha=2022-04-03").
+                    path("usuarios/User1/tesoros_descubiertos?fecha=2022-04-03").
                     request().accept(MediaType.APPLICATION_JSON).
                     post(Entity.json(Json));
 
@@ -190,7 +195,7 @@ public class test {
     // GET /usuarios/id_usuario/tesoros_descubiertos
     // TODO se pueden poner mas filtros con desplazamiento y limite pero no veo como afecta en la bbdd
     String res111 = client.target(getBaseURI()).
-                    path("/usuarios/User1/tesoros_descubiertos?&fecha=2022-04-02").
+                    path("usuarios/User1/tesoros_descubiertos?&fecha=2022-04-02").
                     request().accept(MediaType.APPLICATION_JSON).
                     get(String.class);
     
@@ -198,9 +203,9 @@ public class test {
     System.out.println("\n\n");
 
     String res112 = client.target(getBaseURI()).
-    path("/usuarios/User1/tesoros_descubiertos?&fecha=2022-04-02&dificultad=difícil&terreno=calizo&tamaño=grande").
-    request().accept(MediaType.APPLICATION_JSON).
-    get(String.class);
+                    path("usuarios/User1/tesoros_descubiertos?&fecha=2022-04-02&dificultad=difícil&terreno=calizo&tamaño=grande").
+                    request().accept(MediaType.APPLICATION_JSON).
+                    get(String.class);
 
     System.out.println("respuesta GET2 tesoros descubiertos: "+res112);
     System.out.println("\n\n");   
@@ -216,7 +221,7 @@ public class test {
 
     // POST /usuarios/id/amigos
     Response res121 = client.target(getBaseURI()).
-                        path("/usuarios/User1/amigos?id_Amigo=User2").
+                        path("usuarios/User1/amigos?id_Amigo=User2").
                         request().accept(MediaType.TEXT_PLAIN).
                         post(Entity.json("null")); // no me deja poner el post sin nada en parentesis
     
@@ -224,7 +229,7 @@ public class test {
     System.out.println("\n\n");
 
     Response res122 = client.target(getBaseURI()).
-                        path("/usuarios/User1/amigos?id_Amigo=User3").
+                        path("usuarios/User1/amigos?id_Amigo=User3").
                         request().accept(MediaType.TEXT_PLAIN).
                         post(Entity.json("null")); // no me deja poner el post sin nada en parentesis
     
@@ -262,7 +267,6 @@ public class test {
     System.out.println("\n\n");            
 
     
-    // creo que no va a ser necesario
     /*Json.put("ID","User1");
     Json.put("nombre","Nom1");
     Json.put("apellidos","ApUser1");
