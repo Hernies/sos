@@ -186,7 +186,7 @@ public class UsuarioResource {
     @POST
     @Path("/{usuario_id}/tesoros_añadidos")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     public Response publicarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro) throws ClassNotFoundException, SQLException{ 
         if(tesoro.conNull()){
             return Response.status(Response.Status.BAD_REQUEST).entity("Tesoro a añadir con uno o varios campos nulos").build();
@@ -200,13 +200,13 @@ public class UsuarioResource {
                 //añado a la BD mi usuario
                 Statement stmt = conn.createStatement();
                 String sql;
-                sql="INSERT INTO tesoro (fecha, latitud, longitud, tamaño, dificultad, tipo_terreno, ID_usuario) VALUES ("+ tesoro.getFecha() + ", "+ tesoro.getLatitud()+ ", "+ 
-                tesoro.getLongitud()+ ", '"+tesoro.getTamaño()+ "', '"+tesoro.getDificultad()+"', '" +tesoro.getTipo_terreno()+ "', '"+id+"')";
+                sql="INSERT INTO tesoro (fecha, latitud, longitud, tamaño, dificultad, tipo_terreno,pista ,ID_usuario) VALUES ("+ tesoro.getFecha() + ", "+ tesoro.getLatitud()+ ", "+ 
+                tesoro.getLongitud()+ ", '"+tesoro.getTamaño()+ "', '"+tesoro.getDificultad()+"', '" +tesoro.getTipo_terreno()+ "', '"+tesoro.getPista()+ "', '"+id+"')";
                 stmt.executeUpdate(sql);
             } catch (SQLIntegrityConstraintViolationException ex) {
                 return Response.status(Response.Status.CONFLICT).entity("tesoro ya existe!").build();
             } 
-            return Response.status(Response.Status.OK).entity(tesoro).header("Location", uriInfo.getAbsolutePath()+"/"+id).build();
+            return Response.status(Response.Status.OK).entity("tesoro añadido correctamente").header("Location", uriInfo.getAbsolutePath()+"/"+id).build();
         }
     }
 
@@ -227,7 +227,7 @@ public class UsuarioResource {
                 sql= buildQuery(sql,id,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
                 ResultSet rs = stmt.executeQuery(sql);
                 while(rs.next()){
-                    Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getDate("fecha"), rs.getFloat("latitud"), rs.getFloat("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("pista"),rs.getString("ID_usuario"));
+                    Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getString("fecha"), rs.getFloat("latitud"), rs.getFloat("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("pista"),rs.getString("ID_usuario"));
                     tesorosA.add(tesoro);
                 }
             } catch (SQLException ex) {
@@ -326,7 +326,7 @@ public class UsuarioResource {
                 sql=buildQuery(sql,id,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
                 ResultSet rs = stmt.executeQuery(sql);
                 while(rs.next()){
-                    Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getDate("fecha"), rs.getLong("latitud"), rs.getLong("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("pista"),rs.getString("ID_usuario"));
+                    Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getString("fecha"), rs.getLong("latitud"), rs.getLong("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("pista"),rs.getString("ID_usuario"));
                     tesorosA.add(tesoro);
                 }
             } catch (SQLException ex) {
@@ -377,7 +377,7 @@ public class UsuarioResource {
 
     @GET
     @Path("/{ID_Usuario}/amigos")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAmigos(@PathParam("ID_Usuario") String id, @QueryParam("id_Amigo") String idAmigo, @QueryParam("desplazamiento") int desplazamiento,
      @QueryParam("limite") int limite) throws ClassNotFoundException{
         List<String> amigos = new ArrayList<String>();
@@ -386,7 +386,7 @@ public class UsuarioResource {
             Statement stmt = conn.createStatement();
             String sql;
             if(idAmigo==null){
-                sql ="SELECT * FROM geoetsiinf.es_amigo";
+                sql ="SELECT * FROM geoetsiinf.es_amigo WHERE ID_usuario_1='"+id+"';";
             }
             else{
                 sql = "SELECT * FROM geoetsiinf.es_amigo WHERE ID_usuario_1='"+id+"' AND ID_usuario_2 LIKE '%" + idAmigo +"%'";
@@ -399,7 +399,7 @@ public class UsuarioResource {
             }
                 ResultSet rs = stmt.executeQuery(sql);
             while(rs.next()){
-                String ID = rs.getString("ID_usuario_2 ");
+                String ID = rs.getString("ID_usuario_2");
                 amigos.add(ID);
             }
         } catch (SQLException e){
@@ -468,7 +468,7 @@ public Response resumenUser(@PathParam("ID_Usuario") String idUsuario) throws Cl
         ResultSet rsLista = listaTesoros.executeQuery(sqlLista);
         while(rsLista.next()){
                 Tesoro tesoro = new Tesoro(rsLista.getInt("ID"),
-                            rsLista.getDate("fecha"), 
+                            rsLista.getString("fecha"), 
                             rsLista.getLong("latitud"), 
                             rsLista.getLong("longitud"), 
                             rsLista.getString("tamaño"), 

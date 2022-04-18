@@ -1,13 +1,11 @@
 package com.sos;
-import java.util.Date;
-import java.time.*;
-import javax.json.bind.annotation.JsonbDateFormat;
+
 
 
 public class Tesoro {
 	
 	private int id;
-	private Date fecha;
+	private String fecha;
 	private Float latitud;
 	private Float longitud;
 	private String tamaño;
@@ -16,7 +14,7 @@ public class Tesoro {
 	private String pista;
 	private String ID_usuario;
 	
-	public Tesoro(int id, Date fecha, float f, float g, String tamaño, String dificultad,
+	public Tesoro(int id, String fecha, float f, float g, String tamaño, String dificultad,
 			String tipo_terreno,String pista ,String iD_usuario) {
 		super();
 		this.id = id;
@@ -26,10 +24,14 @@ public class Tesoro {
 		this.tamaño = tamaño;
 		this.dificultad = dificultad;
 		this.tipo_terreno = tipo_terreno;
-		this.pista = pista;
+		this.pista=pista;
 		this.ID_usuario = iD_usuario;
 	}
 	
+	public void setPista(String pista) {
+		this.pista = pista;
+	}
+
 	public Tesoro() {
 		
 	}
@@ -45,10 +47,10 @@ public class Tesoro {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public Date getFecha() {
+	public String getFecha() {
 		return fecha;
 	}
-	public void setFecha(Date fecha) {
+	public void setFecha(String fecha) {
 		this.fecha = fecha;
 	}
 	public Float getLatitud() {
@@ -87,12 +89,10 @@ public class Tesoro {
 	public void setID_usuario(String iD_usuario) {
 		ID_usuario = iD_usuario;
 	}
-
-    public String getID() {
-        return null;
+    public int getID() {
+        return this.id;
     }
-
 	public String getPista() {
-		return null;
+		return this.pista;
 	}
 }
