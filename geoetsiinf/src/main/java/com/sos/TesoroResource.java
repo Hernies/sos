@@ -49,7 +49,7 @@ public class TesoroResource {
     @Path("/nearCoord")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response nearCoordenadas(@QueryParam("fecha") Date date, @QueryParam("latitud") Float latitud, @QueryParam("longitud") Float longitud, @QueryParam("dificultad") String dificultad, 
+    public Response nearCoordenadas(@QueryParam("fecha") String date, @QueryParam("latitud") Float latitud, @QueryParam("longitud") Float longitud, @QueryParam("dificultad") String dificultad, 
     @QueryParam("terreno") String tipo_terreno, @QueryParam("tamaño") String tamaño,@QueryParam("desplazamiento") int desplazamiento, @QueryParam("limite") int limite) throws ClassNotFoundException{
         List<Tesoro> tesorosA = new ArrayList<Tesoro>();
         if(latitud==null||longitud==null){
@@ -60,7 +60,7 @@ public class TesoroResource {
                 Statement stmt = conn.createStatement();
                 String sql;
                 //no se especifica distancia así que asumo que es en un radio de 10 kilómetros a la redonda
-                sql= "SELECT z.id, z.latitud, z.longitud ,z.tamaño, z.dificultad, z.tipo_terreno, z.ID_usuario, p.ud_distancia* DEGREES(ACOS(LEAST(1.0, COS(RADIANS(p.latpoint))* COS(RADIANS(z.latitud))* COS(RADIANS(p.longpoint) - RADIANS(z.longitud)) + SIN(RADIANS(p.latpoint))*SIN(RADIANS(z.latitud))))) AS distance_in_km FROM tesoro AS z /*parámetros de query*/ JOIN (SELECT "+ latitud +" AS latpoint, "+ longitud +" AS longpoint, 10 AS radio, 111.045 AS ud_distancia) AS p ON 1=1 WHERE z.latitud BETWEEN p.latpoint  - (p.radio / p.ud_distancia) AND p.latpoint + (p.radio / p.ud_distancia) AND z.longitud BETWEEN p.longpoint - (p.radio / (p.ud_distancia * COS(RADIANS(p.latpoint)))) AND p.longpoint + (p.radio / (p.ud_distancia * COS(RADIANS(p.latpoint)))) ORDER BY distance_in_km";
+                sql= "SELECT z.id, z.fecha, z.latitud, z.longitud ,z.tamaño, z.dificultad, z.tipo_terreno, z.pista ,z.ID_usuario, p.ud_distancia* DEGREES(ACOS(LEAST(1.0, COS(RADIANS(p.latpoint))* COS(RADIANS(z.latitud))* COS(RADIANS(p.longpoint) - RADIANS(z.longitud)) + SIN(RADIANS(p.latpoint))*SIN(RADIANS(z.latitud))))) AS distance_in_km FROM geoetsiinf.tesoro AS z /*parámetros de query*/ JOIN (SELECT "+ latitud +" AS latpoint, "+ longitud +" AS longpoint, 10 AS radio, 111.045 AS ud_distancia) AS p ON 1=1 WHERE z.latitud BETWEEN p.latpoint  - (p.radio / p.ud_distancia) AND p.latpoint + (p.radio / p.ud_distancia) AND z.longitud BETWEEN p.longpoint - (p.radio / (p.ud_distancia * COS(RADIANS(p.latpoint)))) AND p.longpoint + (p.radio / (p.ud_distancia * COS(RADIANS(p.latpoint)))) ORDER BY distance_in_km";
                 sql = buildQuery(sql,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
                 ResultSet rs = stmt.executeQuery(sql);
                 while(rs.next()){
@@ -74,7 +74,7 @@ public class TesoroResource {
             return Response.status(Response.Status.OK).entity(tesorosA).header("Location", uriInfo.getAbsolutePath()).build();
         }
     
-    private String buildQuery(String sql, Date date, String dificultad, String tipo_terreno, String tamaño,
+    private String buildQuery(String sql, String date, String dificultad, String tipo_terreno, String tamaño,
     int desplazamiento, int limite) {
     //añade a la query el filtro deseado
     String query="";

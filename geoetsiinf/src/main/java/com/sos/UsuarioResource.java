@@ -455,7 +455,7 @@ public Response resumenUser(@PathParam("ID_Usuario") String idUsuario) throws Cl
         //Cogemos los datos del usuario
         Statement informacion = conn.createStatement();
         String sqlInforUser;
-        sqlInforUser="SELECT  FROM encuentra WHERE ID_usuario= '" + idUsuario +"';";
+        sqlInforUser="SELECT * FROM usuario WHERE ID_usuario= '" + idUsuario +"';";
         ResultSet rsUser = informacion.executeQuery(sqlInforUser);
         if(rsUser.next())
             datos = new Usuario(rsUser.getString("ID"),
@@ -514,6 +514,7 @@ public Response resumenUser(@PathParam("ID_Usuario") String idUsuario) throws Cl
     } 
     return Response.status(Response.Status.OK).entity(resumen).build();
 
+    
 }
 
     // private void showDatabases(){
