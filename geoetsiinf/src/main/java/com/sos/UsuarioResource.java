@@ -213,7 +213,7 @@ public class UsuarioResource {
     @GET
     @Path("/{usuario_id}/tesoros_añadidos")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTesorosCreadosUsuario(@PathParam("usuario_id") String id, @QueryParam("fecha") Date date, @QueryParam("dificultad") String dificultad, 
+    public Response getTesorosCreadosUsuario(@PathParam("usuario_id") String id, @QueryParam("fecha") String date, @QueryParam("dificultad") String dificultad, 
     @QueryParam("terreno") String tipo_terreno, @QueryParam("tamaño") String tamaño,@QueryParam("desplazamiento") int desplazamiento, @QueryParam("limite") int limite) throws ClassNotFoundException{
         List<Tesoro> tesorosA = new ArrayList<Tesoro>();
         //if(!CorrectQueryParams(tamaño, dificultad)){
@@ -222,10 +222,10 @@ public class UsuarioResource {
         Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
                 //añado a la BD mi usuario
-                Statement stmt = conn.createStatement();
-                String sql="SELECT * FROM tesoro WHERE (tesoro.ID_usuario LIKE '% "+ id +" %')";
-                sql= buildQuery(sql,id,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
-                ResultSet rs = stmt.executeQuery(sql);
+                String sql="SELECT * FROM tesoro WHERE tesoro.ID_usuario='"+id+"'";
+               sql += buildQuery(sql,id,date,dificultad,tipo_terreno,tamaño,desplazamiento,limite);
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery();
                 while(rs.next()){
                     Tesoro tesoro = new Tesoro(rs.getInt("id"), rs.getString("fecha"), rs.getFloat("latitud"), rs.getFloat("longitud"), rs.getString("tamaño"), rs.getString("dificultad"), rs.getString("tipo_terreno"),rs.getString("pista"),rs.getString("ID_usuario"));
                     tesorosA.add(tesoro);
@@ -244,7 +244,7 @@ public class UsuarioResource {
     @Path("/{usuario_id}/tesoros_descubiertos")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response encontrarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro, @QueryParam("fecha") Date date) throws ClassNotFoundException, SQLException{
+    public Response encontrarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro, @QueryParam("fecha") String date) throws ClassNotFoundException, SQLException{
        
         if(tesoro.conNull()){
             return Response.status(Response.Status.BAD_REQUEST).entity("Tesoro a añadir con uno o varios campos nulos").build();
@@ -266,7 +266,7 @@ public class UsuarioResource {
      @Path("/{usuario_id}/tesoros_añadidos")
      @Consumes(MediaType.APPLICATION_JSON)
      @Produces(MediaType.APPLICATION_JSON)
-     public Response actualizarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro, @QueryParam("fecha") Date date) throws ClassNotFoundException, SQLException{
+     public Response actualizarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro, @QueryParam("fecha") String date) throws ClassNotFoundException, SQLException{
          if(tesoro.conNull()){
              return Response.status(Response.Status.BAD_REQUEST).entity("Tesoro a actualizar con uno o varios campos nulos").build();
          }
@@ -313,7 +313,7 @@ public class UsuarioResource {
     @GET
     @Path("/{usuario_id}/tesoros_descubiertos")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTesorosEncontradoUsuario(@PathParam("usuario_id") String id, @QueryParam("fecha") Date date, @QueryParam("dificultad") String dificultad, 
+    public Response getTesorosEncontradoUsuario(@PathParam("usuario_id") String id, @QueryParam("fecha") String date, @QueryParam("dificultad") String dificultad, 
     @QueryParam("terreno") String tipo_terreno, @QueryParam("tamaño") String tamaño,@QueryParam("desplazamiento") int desplazamiento, @QueryParam("limite") int limite) throws ClassNotFoundException{
         List<Tesoro> tesorosA = new ArrayList<Tesoro>();
         // if(!CorrectQueryParams(tamaño, dificultad)){
@@ -410,17 +410,17 @@ public class UsuarioResource {
     }
 
     
-    private String buildQuery(String sql,String id, Date date, String dificultad, String tipo_terreno, String tamaño,
+    private String buildQuery(String sql,String id, String date, String dificultad, String tipo_terreno, String tamaño,
     int desplazamiento, int limite) {
     String query="";
     if(date!=null){
-        query += "AND (z.fecha < '"+ date +"')";
+        query += "AND (tesoro.fecha < '"+ date +"')";
     }else if(dificultad!=null){
-        query+= "AND (z.dificultad= '"+ dificultad +"')";  
+        query+= "AND (tesoro.dificultad= '"+ dificultad +"')";  
     }else if(tipo_terreno!=null){
-        query += "AND (z.tipo_terreno= '"+tipo_terreno+"')";
+        query += "AND (tesoro.tipo_terreno= '"+tipo_terreno+"')";
     }else if(tamaño!=null){
-        query += "AND (z.tamaño = '"+tamaño+"')";
+        query += "AND (tesoro.tamaño = '"+tamaño+"')";
     }
     if (limite>=1){
         query += "LIMIT " + limite;
