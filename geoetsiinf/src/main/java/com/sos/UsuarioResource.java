@@ -263,10 +263,10 @@ public class UsuarioResource {
         
      }
      @PUT
-     @Path("/{usuario_id}/tesoros_añadidos")
+     @Path("/{usuario_id}/tesoros_añadidos/{tesoro_id}")
      @Consumes(MediaType.APPLICATION_JSON)
-     @Produces(MediaType.APPLICATION_JSON)
-     public Response actualizarTesoro(@PathParam("usuario_id") String id, Tesoro tesoro, @QueryParam("fecha") String date) throws ClassNotFoundException, SQLException{
+     @Produces(MediaType.TEXT_PLAIN)
+     public Response actualizarTesoro(@PathParam("usuario_id") String id, @PathParam("tesoro_id") String idTesoro,Tesoro tesoro) throws ClassNotFoundException, SQLException{
          if(tesoro.conNull()){
              return Response.status(Response.Status.BAD_REQUEST).entity("Tesoro a actualizar con uno o varios campos nulos").build();
          }
@@ -275,33 +275,34 @@ public class UsuarioResource {
                  //añado a la BD un tesoro descubierto por el usuario
                  Statement stmt = conn.createStatement();
                  String sql;
-                 sql="UPDATE encuentra SET "
-                 + "fecha='"+tesoro.getFecha()+"',"
+                 sql="UPDATE tesoro "
+                 + "SET fecha='"+tesoro.getFecha()+"',"
                  + "latitud='"+tesoro.getLatitud()+"',"
                  + "longitud='"+tesoro.getLongitud()+"',"
                  + "tamaño='"+tesoro.getTamaño()+"',"
                  + "dificultad='"+tesoro.getDificultad()+"',"
                  + "tipo_terreno='"+tesoro.getTipo_terreno()+"',"
-                 + "pista='"+tesoro.getPista()+"',"
+                 + "pista='"+tesoro.getPista()+"'"
+                 +"WHERE ID='"+tesoro.getID()+"'"
                  + ";";
                  stmt.executeUpdate(sql);
              } catch (SQLIntegrityConstraintViolationException ex) {
                  return Response.status(Response.Status.CONFLICT).entity("tesoro no pudo ser modificado").build();
              } 
-             return Response.status(Response.Status.OK).entity(tesoro).header("Location", uriInfo.getAbsolutePath()+"/"+id).build();
+             return Response.status(Response.Status.OK).entity("tesoro fue modificado").header("Location", uriInfo.getAbsolutePath()+"/"+id).build();
          
       }
 
     @DELETE
-    @Path("/{usuario_id}/tesoros_añadidos")
+    @Path("/{usuario_id}/tesoros_añadidos/{tesoro_id}")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response removeTesoroTesorosAñadidos(@PathParam("usuario_id") String id, @QueryParam("tesoro_id") int tesoro_id) throws ClassNotFoundException{
+    public Response removeTesoroTesorosAñadidos(@PathParam("usuario_id") String id, @PathParam("tesoro_id") int tesoro_id) throws ClassNotFoundException{
         Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
                 //añado a la BD un tesoro descubierto por el usuario
                 Statement stmt = conn.createStatement();
                 String sql;
-                sql="DELETE * FROM geoetsiinf.tesoros WHERE ID='"+tesoro_id +"' AND ID_usuario='"+id+"' ;";
+                sql="DELETE  FROM geoetsiinf.tesoro WHERE ID='"+tesoro_id +"' AND ID_usuario='"+id+"' ;";
                 stmt.executeUpdate(sql);
             } catch (SQLException ex) {
                 return Response.status(Response.Status.CONFLICT).entity("tesoro no pudo ser borrado").build();
