@@ -1,4 +1,4 @@
-package Cliente;
+package com.sos;
 import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -10,8 +10,7 @@ import javax.ws.rs.core.Response;
 //import org.glassfish.jersey.client.ClientConfig;
 //import org.json.*;
 
-import Modelo.Usuario;
-import Modelo.Tesoro;
+
 
 public class test {
     public static void main(String[] args) {
