@@ -115,19 +115,17 @@ public class UsuarioResource {
             sql="SELECT * FROM geoetsiinf.usuario WHERE ID='"+id+"'";
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-            usuario = new Usuario(rs.getString("ID"),
-            rs.getString("nombre"),
-            rs.getString("apellidos"),
-            rs.getString("localidad"),
-            rs.getString("correo"),
-            rs.getInt("edad"));
-            } else{
-                //reventar
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            }
+            rs.next();
+            usuario = new Usuario();
+            usuario.setId(rs.getString("ID"));
+            usuario.setNombre(rs.getString("nombre"));
+            usuario.setApellidos(rs.getString("apellidos"));
+            usuario.setLocalidad(rs.getString("localidad"));
+            usuario.setCorreo(rs.getString("correo"));
+            usuario.setEdad(rs.getInt("edad"));
+            
         }catch (SQLException e){
-            return Response.status(Response.Status.BAD_REQUEST).entity("o el usuario que buscas no existe o algo has hecho muy mal (quédate con la primera)").header("Content-Location", uriInfo.getAbsolutePath()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("el usuario que buscas no existe ").build();
         }
         return Response.status(Response.Status.OK).entity(usuario).header("Content-Location", uriInfo.getAbsolutePath()).build();
     }
@@ -139,8 +137,11 @@ public class UsuarioResource {
     public Response setUsuario(@PathParam("usuario_id") String id, Usuario usuario) throws ClassNotFoundException {
         Class.forName(DRIVER);
         try (Connection conn = DriverManager.getConnection(url, "access", "1Usuario")) {
-            if(id==null){//si no hemos metido un string debe de fallar
-                return Response.status(Response.Status.BAD_REQUEST).build();
+            if(usuario==null){//si no hemos metido un string debe de fallar
+                return Response.status(Response.Status.BAD_REQUEST).entity("datos a actualizar no adjuntados").build();
+            }
+            if(usuario.hasEmpty()){
+                return Response.status(Response.Status.BAD_REQUEST).entity("datos string a actualizar vacios o con espacio en blanco").build();
             }
             //selecciono de la BD mi usuario
             Statement stmt = conn.createStatement();
@@ -149,10 +150,10 @@ public class UsuarioResource {
                 "',apellidos='"+ usuario.getApellidos() +
                 "',localidad='"+ usuario.getLocalidad() +
                 "',correo='"+ usuario.getCorreo() +
-                "'edad="+ usuario.getEdad()+
-                "' WHERE ID='" + id + "'";
+                "',edad="+ usuario.getEdad()+
+                " WHERE ID='" + id + "'";
 
-            stmt.executeQuery(sql);
+            stmt.executeUpdate(sql);
         } catch (SQLException e){
             throw new IllegalStateException("Cannot connect to the database", e);
         }

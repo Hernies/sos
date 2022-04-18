@@ -69,4 +69,11 @@ public class Usuario {
 	public void setEdad(int edad) {
 		this.edad = edad;
 	}
+
+	public boolean hasEmpty() {
+		return nullEmpty(this.apellidos)||nullEmpty(this.nombre)||nullEmpty(this.correo)||nullEmpty(this.correo);
+	}
+	public boolean nullEmpty(String s){
+		return s == null || s.length()==0;
+	}
 }
